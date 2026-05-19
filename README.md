@@ -1,36 +1,33 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 호실고 (Hosilgo)
 
-## Getting Started
+고시원·원룸텔을 **호실 단위**로 비교·예약하는 웹 MVP입니다.  
+기획 문서 `고시원판 숙소 예약.docx`와 `DESIGN.md`를 바탕으로 구현했습니다.
 
-First, run the development server:
+## 실행
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+브라우저에서 [http://localhost:3000](http://localhost:3000) 을 엽니다.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 주요 화면
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| 경로 | 설명 |
+|------|------|
+| `/` | 메인 — 인트로 애니메이션, 검색, 추천 호실 |
+| `/search` | 검색 결과 (쿼리·필터) |
+| `/rooms/[id]` | 호실 상세 — 문의/방문/입실 예약 CTA |
 
-## Learn More
+## 첫 방문 인터랙션
 
-To learn more about Next.js, take a look at the following resources:
+- **문 열림 인트로**: 좌우 도어가 열리며 브랜드 로고 표시 (세션당 1회)
+- **호실 카드 부채**: 히어로 우측에서 3장의 호실 카드가 펼쳐지며 등장
+- `prefers-reduced-motion` 이면 인트로 생략
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+브랜드명 **호실고**는 「호실」+「고르다」에서 따온 이름으로, 서비스 핵심(호실 단위 선택)을 직관적으로 전달합니다.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 스택
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Next.js 16 · TypeScript · Tailwind CSS v4 · shadcn/ui · Framer Motion
