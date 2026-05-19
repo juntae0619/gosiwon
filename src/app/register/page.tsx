@@ -3,16 +3,27 @@ import { isDatabaseEnabled } from "@/db";
 import { RegisterForm } from "@/components/register-form";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { getTempRoomById } from "@/lib/temp-rooms";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
 export const metadata = {
   title: "방 등록하기 — 호실고",
-  description: "고시원 호실을 등록하고 로컬 DB에 저장합니다.",
+  description: "고시원 호실을 등록합니다.",
 };
 
-export default function RegisterPage() {
+type Props = {
+  searchParams: Promise<{ tempRegistered?: string; roomId?: string }>;
+};
+
+export default async function RegisterPage({ searchParams }: Props) {
   const dbEnabled = isDatabaseEnabled();
+  const { tempRegistered, roomId } = await searchParams;
+  const showTempSuccess = tempRegistered === "1";
+  const tempRoom =
+    showTempSuccess && roomId ? await getTempRoomById(roomId) : null;
 
   return (
     <div className="min-h-screen bg-[#F7F3ED]">
@@ -32,15 +43,71 @@ export default function RegisterPage() {
           반영됩니다.
         </p>
 
-        {!dbEnabled && (
+        {showTempSuccess && (
+          <div
+            className="mt-6 rounded-2xl border border-[#4A6B5D]/30 bg-[#4A6B5D]/10 px-5 py-4"
+            role="status"
+          >
+            <p className="font-semibold text-[#4A6B5D]">
+              임시로 등록되었습니다.
+            </p>
+            <p className="mt-1 text-sm text-[#5C534C]">
+              {dbEnabled
+                ? "등록 내용을 확인한 뒤 아래에서 이어서 등록할 수 있습니다."
+                : "이 브라우저에만 저장됩니다. Turso DB 연결 시 영구 저장됩니다."}
+              {tempRoom && (
+                <>
+                  {" "}
+                  <span className="font-medium text-[#1A1614]">
+                    {tempRoom.gosiwon} {tempRoom.roomNumber}
+                  </span>
+                  이 추가되었습니다.
+                </>
+              )}
+            </p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {tempRoom && (
+                <Link
+                  href={`/rooms/${tempRoom.id}?tempRegistered=1`}
+                  className={cn(
+                    buttonVariants({ size: "sm" }),
+                    "rounded-lg bg-[#4A6B5D] text-white hover:bg-[#3d5a4f]"
+                  )}
+                >
+                  등록한 호실 보기
+                </Link>
+              )}
+              <Link
+                href="/search"
+                className={cn(
+                  buttonVariants({ size: "sm", variant: "outline" }),
+                  "rounded-lg border-[#E8E0D4]"
+                )}
+              >
+                방 찾기에서 확인
+              </Link>
+              <Link
+                href="/register"
+                className={cn(
+                  buttonVariants({ size: "sm", variant: "outline" }),
+                  "rounded-lg border-[#E8E0D4]"
+                )}
+              >
+                추가 등록하기
+              </Link>
+            </div>
+          </div>
+        )}
+
+        {!dbEnabled && !showTempSuccess && (
           <p className="mt-4 rounded-xl border border-[#D4A24C]/40 bg-[#D4A24C]/10 px-4 py-3 text-sm text-[#5C534C]">
-            Vercel 배포 환경에서는 방 찾기는 샘플 데이터로 동작합니다. 호실
-            등록·저장은 Turso DB 연결 후 사용할 수 있습니다.
+            DB가 연결되지 않은 환경에서는 <strong>임시 등록</strong>으로 이
+            기기에서만 조회할 수 있습니다.
           </p>
         )}
 
         <div className="mt-10 rounded-3xl border border-[#E8E0D4] bg-[#FFFCF7] p-6 shadow-sm md:p-8">
-          <RegisterForm dbEnabled={dbEnabled} />
+          <RegisterForm dbEnabled={dbEnabled} showTempHint={!dbEnabled} />
         </div>
       </main>
       <SiteFooter />

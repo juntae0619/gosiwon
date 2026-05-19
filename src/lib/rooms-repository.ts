@@ -4,6 +4,7 @@ import { desc, eq } from "drizzle-orm";
 import { ensureDb, isDatabaseEnabled } from "@/db";
 import { roomsTable, type RoomRow } from "@/db/schema";
 import { ROOMS, roomPhoto, type Room } from "@/lib/data";
+import { getTempRoomById, getTempRooms } from "@/lib/temp-rooms";
 
 function rowToRoom(row: RoomRow): Room {
   return {
@@ -31,27 +32,37 @@ function findSeedRoom(id: string): Room | null {
   return ROOMS.find((r) => r.id === id) ?? null;
 }
 
+async function mergeWithTempRooms(rooms: Room[]): Promise<Room[]> {
+  const temp = await getTempRooms();
+  const ids = new Set(rooms.map((r) => r.id));
+  const merged = [...temp.filter((r) => !ids.has(r.id)), ...rooms];
+  return merged;
+}
+
 export async function getAllRooms(): Promise<Room[]> {
   if (!isDatabaseEnabled()) {
-    return [...ROOMS];
+    return mergeWithTempRooms([...ROOMS]);
   }
 
   try {
     const db = await ensureDb();
-    if (!db) return [...ROOMS];
+    if (!db) return mergeWithTempRooms([...ROOMS]);
 
     const rows = await db
       .select()
       .from(roomsTable)
       .orderBy(desc(roomsTable.createdAt));
-    return rows.map(rowToRoom);
+    return mergeWithTempRooms(rows.map(rowToRoom));
   } catch (error) {
     console.error("[rooms] getAllRooms failed, using seed", error);
-    return [...ROOMS];
+    return mergeWithTempRooms([...ROOMS]);
   }
 }
 
 export async function getRoomById(id: string): Promise<Room | null> {
+  const temp = await getTempRoomById(id);
+  if (temp) return temp;
+
   if (!isDatabaseEnabled()) {
     return findSeedRoom(id);
   }

@@ -10,14 +10,14 @@ import { getRoomById } from "@/lib/rooms-repository";
 
 type Props = {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ registered?: string }>;
+  searchParams: Promise<{ registered?: string; tempRegistered?: string }>;
 };
 
 export const dynamic = "force-dynamic";
 
 export default async function RoomDetailPage({ params, searchParams }: Props) {
   const { id } = await params;
-  const { registered } = await searchParams;
+  const { registered, tempRegistered } = await searchParams;
   const room = await getRoomById(id);
   if (!room) notFound();
 
@@ -32,10 +32,19 @@ export default async function RoomDetailPage({ params, searchParams }: Props) {
           ← 검색으로
         </Link>
 
-        {registered === "1" && (
+        {tempRegistered === "1" && (
+          <p className="mt-4 rounded-xl border border-[#D4A24C]/40 bg-[#D4A24C]/10 px-4 py-3 text-sm text-[#5C534C]">
+            <strong className="text-[#1A1614]">임시로 등록되었습니다.</strong>{" "}
+            이 브라우저에서만 조회됩니다.{" "}
+            <Link href="/register" className="font-medium text-[#C45C3E] hover:underline">
+              추가 등록하기
+            </Link>
+          </p>
+        )}
+
+        {registered === "1" && !tempRegistered && (
           <p className="mt-4 rounded-xl border border-[#4A6B5D]/30 bg-[#4A6B5D]/10 px-4 py-3 text-sm text-[#4A6B5D]">
-            호실이 로컬 DB에 저장되었습니다. 검색·상세에서 바로 확인할 수
-            있습니다.
+            호실이 저장되었습니다. 검색·상세에서 바로 확인할 수 있습니다.
           </p>
         )}
 
