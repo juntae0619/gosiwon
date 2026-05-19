@@ -1,21 +1,24 @@
-import Image from "next/image";
 import Link from "next/link";
+import { RoomImage } from "@/components/room-image";
 import { notFound } from "next/navigation";
 import { Bath, Calendar, DoorOpen, MapPin, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { ROOMS, formatPrice } from "@/lib/data";
+import { formatPrice } from "@/lib/data";
+import { getRoomById } from "@/lib/rooms-repository";
 
-type Props = { params: Promise<{ id: string }> };
+type Props = {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ registered?: string }>;
+};
 
-export async function generateStaticParams() {
-  return ROOMS.map((r) => ({ id: r.id }));
-}
+export const dynamic = "force-dynamic";
 
-export default async function RoomDetailPage({ params }: Props) {
+export default async function RoomDetailPage({ params, searchParams }: Props) {
   const { id } = await params;
-  const room = ROOMS.find((r) => r.id === id);
+  const { registered } = await searchParams;
+  const room = getRoomById(id);
   if (!room) notFound();
 
   return (
@@ -29,13 +32,19 @@ export default async function RoomDetailPage({ params }: Props) {
           ← 검색으로
         </Link>
 
+        {registered === "1" && (
+          <p className="mt-4 rounded-xl border border-[#4A6B5D]/30 bg-[#4A6B5D]/10 px-4 py-3 text-sm text-[#4A6B5D]">
+            호실이 로컬 DB에 저장되었습니다. 검색·상세에서 바로 확인할 수
+            있습니다.
+          </p>
+        )}
+
         <div className="mt-6 overflow-hidden rounded-3xl border border-[#E8E0D4] bg-[#FFFCF7] shadow-lg">
-          <div className="relative aspect-[16/10]">
-            <Image
+          <div className="relative aspect-[16/10] min-h-[220px] bg-[#E8E0D4]">
+            <RoomImage
               src={room.image}
-              alt={`${room.gosiwon} ${room.roomNumber}`}
-              fill
-              className="object-cover"
+              alt={`${room.gosiwon} ${room.roomNumber} 실내 사진`}
+              roomNumber={room.roomNumber}
               priority
               sizes="(max-width:896px) 100vw, 896px"
             />

@@ -6,10 +6,16 @@ import { useState } from "react";
 import { Search, MapPin, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { QUICK_FILTERS, REGIONS } from "@/lib/data";
+import { QUICK_FILTERS, REGIONS, type Room } from "@/lib/data";
 import { RoomFan } from "@/components/room-fan";
 
-export function HeroSection({ ready }: { ready: boolean }) {
+export function HeroSection({
+  ready,
+  rooms,
+}: {
+  ready: boolean;
+  rooms: Room[];
+}) {
   const [query, setQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
 
@@ -145,7 +151,7 @@ export function HeroSection({ ready }: { ready: boolean }) {
             </div>
           </motion.div>
 
-          <RoomFan ready={ready} />
+          <RoomFan ready={ready} rooms={rooms} />
         </div>
       </motion.div>
     </section>

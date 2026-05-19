@@ -1,15 +1,14 @@
 "use client";
 
 import { motion } from "framer-motion";
-import Image from "next/image";
-import { ROOMS } from "@/lib/data";
+import { RoomImage } from "@/components/room-image";
+import type { Room } from "@/lib/data";
 
-const FAN_ROOMS = ROOMS.slice(0, 3);
-
-export function RoomFan({ ready }: { ready: boolean }) {
+export function RoomFan({ ready, rooms }: { ready: boolean; rooms: Room[] }) {
+  const fanRooms = rooms.slice(0, 3);
   return (
     <div className="relative mx-auto flex h-[420px] w-full max-w-md items-center justify-center lg:h-[480px] lg:max-w-none">
-      {FAN_ROOMS.map((room, i) => {
+      {fanRooms.map((room, i) => {
         const rotations = [-12, 0, 12];
         const xOffsets = [-90, 0, 90];
         const yOffsets = [20, 0, 20];
@@ -54,15 +53,14 @@ export function RoomFan({ ready }: { ready: boolean }) {
             }}
           >
             <motion.div
-              className="relative aspect-[4/3] overflow-hidden"
+              className="relative aspect-[4/3] min-h-[140px] overflow-hidden bg-[#E8E0D4]"
               whileHover={{ scale: 1.05 }}
               transition={{ duration: 0.4 }}
             >
-              <Image
+              <RoomImage
                 src={room.image}
-                alt={`${room.gosiwon} ${room.roomNumber}`}
-                fill
-                className="object-cover"
+                alt={`${room.gosiwon} ${room.roomNumber} 실내 사진`}
+                roomNumber={room.roomNumber}
                 sizes="220px"
                 priority={i === 1}
               />

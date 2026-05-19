@@ -1,8 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
-import Image from "next/image";
 import Link from "next/link";
+import { RoomImage } from "@/components/room-image";
 import { Bath, Calendar, DoorOpen, Globe, Shield } from "lucide-react";
 import type { Room } from "@/lib/data";
 import { formatPrice } from "@/lib/data";
@@ -18,16 +18,15 @@ export function RoomCard({ room, index = 0 }: { room: Room; index?: number }) {
       <Link href={`/rooms/${room.id}`} className="group block">
         <div className="overflow-hidden rounded-[20px] border border-[#E8E0D4] bg-[#FFFCF7] shadow-[0_4px_24px_-8px_rgba(26,22,20,0.1)] transition-shadow group-hover:shadow-[0_12px_40px_-12px_rgba(196,92,62,0.2)]">
           <motion.div
-            className="relative aspect-[4/3] overflow-hidden"
+            className="relative aspect-[4/3] min-h-[200px] overflow-hidden bg-[#E8E0D4]"
             whileHover={{ scale: 1.03 }}
             transition={{ duration: 0.35 }}
           >
-            <Image
+            <RoomImage
               src={room.image}
-              alt={`${room.gosiwon} ${room.roomNumber}`}
-              fill
-              className="object-cover transition-transform duration-500 group-hover:scale-105"
-              sizes="(max-width:768px) 100vw, 33vw"
+              alt={`${room.gosiwon} ${room.roomNumber} 실내 사진`}
+              roomNumber={room.roomNumber}
+              className="transition-transform duration-500 group-hover:scale-105"
             />
             <motion.div
               className="absolute inset-0 bg-gradient-to-t from-[#1A1614]/50 via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100"

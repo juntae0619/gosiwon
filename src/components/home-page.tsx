@@ -8,8 +8,9 @@ import { FeaturesSection } from "@/components/features-section";
 import { RoomsSection } from "@/components/rooms-section";
 import { CtaSection } from "@/components/cta-section";
 import { SiteFooter } from "@/components/site-footer";
+import type { Room } from "@/lib/data";
 
-export function HomePage() {
+export function HomePage({ rooms }: { rooms: Room[] }) {
   const [ready, setReady] = useState(false);
 
   const handleIntroComplete = useCallback(() => {
@@ -22,9 +23,9 @@ export function HomePage() {
       <div className="min-h-screen bg-[#F7F3ED]">
         <SiteHeader ready={ready} />
         <main>
-          <HeroSection ready={ready} />
+          <HeroSection ready={ready} rooms={rooms} />
           <FeaturesSection />
-          <RoomsSection />
+          <RoomsSection rooms={rooms} />
           <CtaSection />
         </main>
         <SiteFooter />

@@ -1,11 +1,35 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
+import { Menu, X } from "lucide-react";
+import { useState } from "react";
 import { buttonVariants } from "@/components/ui/button";
+import { HashLink } from "@/components/hash-link";
 import { cn } from "@/lib/utils";
 
+const NAV_ITEMS = [
+  { label: "방 찾기", href: "/search", type: "route" as const },
+  { label: "왜 호실고인가", href: "/#features" as const, type: "hash" as const },
+  { label: "추천 호실", href: "/#rooms" as const, type: "hash" as const },
+] as const;
+
 export function SiteHeader({ ready }: { ready: boolean }) {
+  const pathname = usePathname();
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const isActive = (item: (typeof NAV_ITEMS)[number]) => {
+    if (item.type === "route") return pathname === item.href;
+    return false;
+  };
+
+  const linkClass = (active: boolean) =>
+    cn(
+      "transition-colors hover:text-[#C45C3E]",
+      active && "font-semibold text-[#C45C3E]"
+    );
+
   return (
     <motion.header
       className="sticky top-0 z-50 border-b border-[#E8E0D4]/60 bg-[#F7F3ED]/85 backdrop-blur-md"
@@ -13,13 +37,12 @@ export function SiteHeader({ ready }: { ready: boolean }) {
       animate={ready ? { y: 0, opacity: 1 } : {}}
       transition={{ delay: 0.2, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
     >
-      <motion.div
-        className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 md:px-6"
-        initial={{ opacity: 0 }}
-        animate={ready ? { opacity: 1 } : {}}
-        transition={{ delay: 0.35 }}
-      >
-        <Link href="/" className="group flex items-center gap-2">
+      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 md:px-6">
+        <Link
+          href="/"
+          className="group flex items-center gap-2"
+          onClick={() => setMenuOpen(false)}
+        >
           <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#C45C3E] font-serif text-lg font-bold text-white shadow-md transition-transform group-hover:scale-105">
             室
           </span>
@@ -32,33 +55,101 @@ export function SiteHeader({ ready }: { ready: boolean }) {
             </span>
           </div>
         </Link>
+
+        {/* Desktop nav */}
         <nav className="hidden items-center gap-8 text-sm font-medium text-[#5C534C] md:flex">
-          <Link href="/search" className="transition-colors hover:text-[#C45C3E]">
-            방 찾기
-          </Link>
-          <a href="#features" className="transition-colors hover:text-[#C45C3E]">
-            왜 호실고인가
-          </a>
-          <a href="#rooms" className="transition-colors hover:text-[#C45C3E]">
-            추천 호실
-          </a>
+          {NAV_ITEMS.map((item) =>
+            item.type === "route" ? (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={linkClass(isActive(item))}
+              >
+                {item.label}
+              </Link>
+            ) : (
+              <HashLink
+                key={item.href}
+                href={item.href}
+                className={linkClass(isActive(item))}
+              >
+                {item.label}
+              </HashLink>
+            )
+          )}
         </nav>
+
         <motion.div
+          className="flex items-center gap-2"
           initial={{ opacity: 0, x: 12 }}
           animate={ready ? { opacity: 1, x: 0 } : {}}
           transition={{ delay: 0.45 }}
         >
           <Link
-            href="/search"
+            href="/register"
             className={cn(
               buttonVariants({ size: "default" }),
-              "rounded-xl bg-[#C45C3E] px-5 text-white shadow-md hover:bg-[#A84A32]"
+              "hidden rounded-xl bg-[#C45C3E] px-5 text-white shadow-md hover:bg-[#A84A32] sm:inline-flex"
             )}
           >
             방 등록하기
           </Link>
+
+          <button
+            type="button"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[#E8E0D4] bg-[#FFFCF7] text-[#1A1614] md:hidden"
+            aria-expanded={menuOpen}
+            aria-label={menuOpen ? "메뉴 닫기" : "메뉴 열기"}
+            onClick={() => setMenuOpen((o) => !o)}
+          >
+            {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
         </motion.div>
-      </motion.div>
+      </div>
+
+      {/* Mobile nav */}
+      {menuOpen && (
+        <nav className="border-t border-[#E8E0D4]/60 bg-[#FFFCF7] px-4 py-4 md:hidden">
+          <ul className="flex flex-col gap-1">
+            {NAV_ITEMS.map((item) => (
+              <li key={item.href}>
+                {item.type === "route" ? (
+                  <Link
+                    href={item.href}
+                    className={cn(
+                      "block rounded-lg px-3 py-2.5 text-sm font-medium text-[#5C534C] hover:bg-[#F7F3ED] hover:text-[#C45C3E]",
+                      isActive(item) && "bg-[#F7F3ED] font-semibold text-[#C45C3E]"
+                    )}
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    {item.label}
+                  </Link>
+                ) : (
+                  <HashLink
+                    href={item.href}
+                    onNavigate={() => setMenuOpen(false)}
+                    className="block rounded-lg px-3 py-2.5 text-sm font-medium text-[#5C534C] hover:bg-[#F7F3ED] hover:text-[#C45C3E]"
+                  >
+                    {item.label}
+                  </HashLink>
+                )}
+              </li>
+            ))}
+            <li className="mt-2 border-t border-[#E8E0D4] pt-2">
+              <Link
+                href="/register"
+                className={cn(
+                  buttonVariants({ size: "default" }),
+                  "flex w-full justify-center rounded-xl bg-[#C45C3E] text-white hover:bg-[#A84A32]"
+                )}
+                onClick={() => setMenuOpen(false)}
+              >
+                방 등록하기
+              </Link>
+            </li>
+          </ul>
+        </nav>
+      )}
     </motion.header>
   );
 }

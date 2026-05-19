@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { HashLink } from "@/components/hash-link";
 
 export function SiteFooter() {
   return (
@@ -20,9 +21,14 @@ export function SiteFooter() {
                 </Link>
               </li>
               <li>
-                <a href="#features" className="hover:text-[#C45C3E]">
+                <HashLink href="/#features" className="hover:text-[#C45C3E]">
                   소개
-                </a>
+                </HashLink>
+              </li>
+              <li>
+                <HashLink href="/#rooms" className="hover:text-[#C45C3E]">
+                  추천 호실
+                </HashLink>
               </li>
             </ul>
           </div>

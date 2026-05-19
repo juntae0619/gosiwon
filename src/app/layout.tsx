@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Noto_Serif_KR, Gothic_A1 } from "next/font/google";
+import { HashScrollHandler } from "@/components/hash-scroll-handler";
 import "./globals.css";
 
 const notoSerif = Noto_Serif_KR({
@@ -27,7 +28,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko" className={`${notoSerif.variable} ${gothicA1.variable} h-full`}>
-      <body className="min-h-full font-sans antialiased">{children}</body>
+      <body className="min-h-full font-sans antialiased">
+        <HashScrollHandler />
+        {children}
+      </body>
     </html>
   );
 }

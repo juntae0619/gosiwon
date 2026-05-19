@@ -6,11 +6,11 @@ import { ArrowRight } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { RoomCard } from "@/components/room-card";
-import { ROOMS } from "@/lib/data";
+import type { Room } from "@/lib/data";
 
-export function RoomsSection() {
-  const todayRooms = ROOMS.filter((r) => r.moveIn === "today");
-  const noDeposit = ROOMS.filter((r) => r.noDeposit);
+export function RoomsSection({ rooms }: { rooms: Room[] }) {
+  const todayRooms = rooms.filter((r) => r.moveIn === "today");
+  const noDeposit = rooms.filter((r) => r.noDeposit);
 
   return (
     <section id="rooms" className="py-20 md:py-28">

@@ -56,7 +56,7 @@ export function CtaSection() {
               방 찾아보기
             </Link>
             <Link
-              href="/search?role=owner"
+              href="/register"
               className={cn(
                 buttonVariants({ size: "lg", variant: "outline" }),
                 "rounded-xl border-[#E8E0D4]/30 bg-transparent text-[#FFFCF7] hover:bg-white/10 hover:text-white"

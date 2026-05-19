@@ -37,6 +37,11 @@ export const REGIONS = [
   "영등포",
 ] as const;
 
+/** 호실별 고정 시드 — picsum.photos CDN (Unsplash 404 이슈 대체) */
+export function roomPhoto(id: string) {
+  return `https://picsum.photos/seed/hosilgo-${id}/800/600`;
+}
+
 export const FEATURES = [
   {
     title: "호실 단위로 고르기",
@@ -80,8 +85,7 @@ export const ROOMS: Room[] = [
     moveInLabel: "오늘 입실 가능",
     noDeposit: true,
     foreignerFriendly: true,
-    image:
-      "https://images.unsplash.com/photo-1522708323590-24a8e8278379?w=800&q=80",
+    image: roomPhoto("a-301"),
     tags: ["창문", "개인화장실", "보증금 없음"],
   },
   {
@@ -97,8 +101,7 @@ export const ROOMS: Room[] = [
     bathroom: "shared",
     moveIn: "week",
     moveInLabel: "6일 후 입실",
-    image:
-      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80",
+    image: roomPhoto("a-302"),
     tags: ["공용화장실", "가성비"],
   },
   {
@@ -115,8 +118,7 @@ export const ROOMS: Room[] = [
     moveIn: "reservation",
     moveInLabel: "예약 가능",
     womenOnly: true,
-    image:
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80",
+    image: roomPhoto("a-303"),
     tags: ["여성 전용", "개인 냉장고"],
   },
   {
@@ -134,8 +136,7 @@ export const ROOMS: Room[] = [
     moveInLabel: "오늘 입실 가능",
     noDeposit: true,
     foreignerFriendly: true,
-    image:
-      "https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800&q=80",
+    image: roomPhoto("b-201"),
     tags: ["즉시입실", "외국인 가능"],
   },
   {
@@ -152,8 +153,7 @@ export const ROOMS: Room[] = [
     moveIn: "week",
     moveInLabel: "이번 주 입실",
     foreignerFriendly: true,
-    image:
-      "https://images.unsplash.com/photo-1484154218962-a197022b5858?w=800&q=80",
+    image: roomPhoto("c-105"),
     tags: ["대형", "개인화장실"],
   },
   {
@@ -169,8 +169,7 @@ export const ROOMS: Room[] = [
     bathroom: "shared",
     moveIn: "today",
     moveInLabel: "오늘 입실 가능",
-    image:
-      "https://images.unsplash.com/photo-1554995207-c18c203602cb?w=800&q=80",
+    image: roomPhoto("d-402"),
     tags: ["대학가", "조용한 층"],
   },
 ];
