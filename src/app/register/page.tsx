@@ -10,8 +10,8 @@ import { cn } from "@/lib/utils";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "방 등록하기 — 호실고",
-  description: "고시원 호실을 등록합니다.",
+  title: "호실 등록 — 호실고",
+  description: "고시원 호실별 사진·가격을 등록합니다.",
 };
 
 type Props = {
@@ -36,11 +36,18 @@ export default async function RegisterPage({ searchParams }: Props) {
           ← 홈으로
         </Link>
         <h1 className="mt-4 font-serif text-3xl font-bold text-[#1A1614]">
-          방 등록하기
+          호실 등록
         </h1>
         <p className="mt-2 text-sm text-[#5C534C]">
-          사업자·관리자가 호실 정보를 입력하면 검색·상세 페이지에 바로
-          반영됩니다.
+          입점 승인된 사업자가 호실별 사진·가격·입실 조건을 등록하면 검색·상세
+          페이지에 반영됩니다. 아직 입점하지 않으셨다면{" "}
+          <Link
+            href="/business/register"
+            className="font-medium text-[#C45C3E] hover:underline"
+          >
+            사업자 등록
+          </Link>
+          을 먼저 진행해 주세요.
         </p>
 
         {showTempSuccess && (

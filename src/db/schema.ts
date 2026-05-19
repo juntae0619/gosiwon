@@ -23,3 +23,25 @@ export const roomsTable = sqliteTable("rooms", {
 
 export type RoomRow = typeof roomsTable.$inferSelect;
 export type NewRoomRow = typeof roomsTable.$inferInsert;
+
+export const businessesTable = sqliteTable("businesses", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  ownerName: text("owner_name").notNull(),
+  phone: text("phone").notNull(),
+  email: text("email"),
+  district: text("district").notNull(),
+  address: text("address").notNull(),
+  station: text("station").notNull(),
+  totalRooms: integer("total_rooms"),
+  bizNumber: text("biz_number"),
+  description: text("description"),
+  foreignerFriendly: integer("foreigner_friendly", { mode: "boolean" }),
+  womenOnly: integer("women_only", { mode: "boolean" }),
+  status: text("status", { enum: ["pending", "approved"] })
+    .notNull()
+    .default("pending"),
+  createdAt: text("created_at").notNull(),
+});
+
+export type BusinessRow = typeof businessesTable.$inferSelect;
