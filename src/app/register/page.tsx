@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { isDatabaseEnabled } from "@/db";
 import { RegisterForm } from "@/components/register-form";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
@@ -11,6 +12,8 @@ export const metadata = {
 };
 
 export default function RegisterPage() {
+  const dbEnabled = isDatabaseEnabled();
+
   return (
     <div className="min-h-screen bg-[#F7F3ED]">
       <SiteHeader ready={true} />
@@ -29,8 +32,15 @@ export default function RegisterPage() {
           반영됩니다.
         </p>
 
+        {!dbEnabled && (
+          <p className="mt-4 rounded-xl border border-[#D4A24C]/40 bg-[#D4A24C]/10 px-4 py-3 text-sm text-[#5C534C]">
+            Vercel 배포 환경에서는 방 찾기는 샘플 데이터로 동작합니다. 호실
+            등록·저장은 Turso DB 연결 후 사용할 수 있습니다.
+          </p>
+        )}
+
         <div className="mt-10 rounded-3xl border border-[#E8E0D4] bg-[#FFFCF7] p-6 shadow-sm md:p-8">
-          <RegisterForm />
+          <RegisterForm dbEnabled={dbEnabled} />
         </div>
       </main>
       <SiteFooter />

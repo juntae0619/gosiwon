@@ -28,6 +28,16 @@ npm run dev
 
 브랜드명 **호실고**는 「호실」+「고르다」에서 따온 이름으로, 서비스 핵심(호실 단위 선택)을 직관적으로 전달합니다.
 
+## 데이터베이스
+
+| 환경 | 동작 |
+|------|------|
+| **로컬** | `data/hosilgo.db` (libSQL 파일) |
+| **Vercel** | 샘플 6개 호실로 방 찾기·상세 조회 (에러 없음) |
+| **Vercel + Turso** | `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN` 설정 시 등록·저장 가능 |
+
+Vercel은 서버리스라 파일 SQLite(`better-sqlite3`)를 쓸 수 없어 **libSQL** + 배포 시 **시드 폴백**을 사용합니다.
+
 ## 스택
 
-Next.js 16 · TypeScript · Tailwind CSS v4 · shadcn/ui · Framer Motion
+Next.js 16 · TypeScript · Tailwind CSS v4 · shadcn/ui · Framer Motion · libSQL

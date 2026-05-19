@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { isDatabaseEnabled } from "@/db";
 import {
   createRoom,
   type CreateRoomInput,
@@ -72,6 +73,14 @@ export async function registerRoomAction(
     };
   }
 
+  if (!isDatabaseEnabled()) {
+    return {
+      ok: false,
+      message:
+        "Vercel 배포 환경에서는 DB(Turso) 설정 전까지 등록이 제한됩니다. 방 찾기·목록은 샘플 데이터로 이용 가능합니다.",
+    };
+  }
+
   const input: CreateRoomInput = {
     gosiwon,
     roomNumber,
@@ -94,7 +103,7 @@ export async function registerRoomAction(
 
   let room;
   try {
-    room = createRoom(input);
+    room = await createRoom(input);
   } catch {
     return {
       ok: false,

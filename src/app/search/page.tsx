@@ -11,8 +11,8 @@ export const metadata = {
 
 export const dynamic = "force-dynamic";
 
-export default function SearchPage() {
-  const rooms = getAllRooms();
+export default async function SearchPage() {
+  const rooms = await getAllRooms();
 
   return (
     <div className="min-h-screen bg-[#F7F3ED]">
@@ -30,7 +30,7 @@ export default function SearchPage() {
               방 찾기
             </h1>
             <p className="mt-1 text-sm text-[#5C534C]">
-              로컬 DB에 저장된 호실을 검색합니다.
+              등록된 호실을 검색합니다.
             </p>
           </div>
           <Link

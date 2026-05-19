@@ -18,7 +18,7 @@ export const dynamic = "force-dynamic";
 export default async function RoomDetailPage({ params, searchParams }: Props) {
   const { id } = await params;
   const { registered } = await searchParams;
-  const room = getRoomById(id);
+  const room = await getRoomById(id);
   if (!room) notFound();
 
   return (

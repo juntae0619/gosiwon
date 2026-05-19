@@ -1,10 +1,9 @@
 import "server-only";
 
 import { desc, eq } from "drizzle-orm";
-import { getDb } from "@/db";
+import { ensureDb, isDatabaseEnabled } from "@/db";
 import { roomsTable, type RoomRow } from "@/db/schema";
-import type { Room } from "@/lib/data";
-import { roomPhoto } from "@/lib/data";
+import { ROOMS, roomPhoto, type Room } from "@/lib/data";
 
 function rowToRoom(row: RoomRow): Room {
   return {
@@ -28,24 +27,51 @@ function rowToRoom(row: RoomRow): Room {
   };
 }
 
-export function getAllRooms(): Room[] {
-  const db = getDb();
-  const rows = db
-    .select()
-    .from(roomsTable)
-    .orderBy(desc(roomsTable.createdAt))
-    .all();
-  return rows.map(rowToRoom);
+function findSeedRoom(id: string): Room | null {
+  return ROOMS.find((r) => r.id === id) ?? null;
 }
 
-export function getRoomById(id: string): Room | null {
-  const db = getDb();
-  const row = db
-    .select()
-    .from(roomsTable)
-    .where(eq(roomsTable.id, id))
-    .get();
-  return row ? rowToRoom(row) : null;
+export async function getAllRooms(): Promise<Room[]> {
+  if (!isDatabaseEnabled()) {
+    return [...ROOMS];
+  }
+
+  try {
+    const db = await ensureDb();
+    if (!db) return [...ROOMS];
+
+    const rows = await db
+      .select()
+      .from(roomsTable)
+      .orderBy(desc(roomsTable.createdAt));
+    return rows.map(rowToRoom);
+  } catch (error) {
+    console.error("[rooms] getAllRooms failed, using seed", error);
+    return [...ROOMS];
+  }
+}
+
+export async function getRoomById(id: string): Promise<Room | null> {
+  if (!isDatabaseEnabled()) {
+    return findSeedRoom(id);
+  }
+
+  try {
+    const db = await ensureDb();
+    if (!db) return findSeedRoom(id);
+
+    const rows = await db
+      .select()
+      .from(roomsTable)
+      .where(eq(roomsTable.id, id))
+      .limit(1);
+
+    if (rows[0]) return rowToRoom(rows[0]);
+    return findSeedRoom(id);
+  } catch (error) {
+    console.error("[rooms] getRoomById failed, using seed", error);
+    return findSeedRoom(id);
+  }
 }
 
 export type CreateRoomInput = {
@@ -72,8 +98,16 @@ const MOVE_IN_LABELS: Record<CreateRoomInput["moveIn"], string> = {
   reservation: "예약 가능",
 };
 
-export function createRoom(input: CreateRoomInput): Room {
-  const db = getDb();
+export async function createRoom(input: CreateRoomInput): Promise<Room> {
+  if (!isDatabaseEnabled()) {
+    throw new Error("DATABASE_DISABLED");
+  }
+
+  const db = await ensureDb();
+  if (!db) {
+    throw new Error("DATABASE_DISABLED");
+  }
+
   const id = `custom-${Date.now()}`;
   const tags = input.tags?.filter(Boolean) ?? [];
   const row = {
@@ -97,8 +131,9 @@ export function createRoom(input: CreateRoomInput): Room {
     createdAt: new Date().toISOString(),
   };
 
-  db.insert(roomsTable).values(row).run();
-  const saved = getRoomById(id);
+  await db.insert(roomsTable).values(row);
+
+  const saved = await getRoomById(id);
   if (!saved) {
     throw new Error("Failed to read saved room");
   }

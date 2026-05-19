@@ -1,29 +1,45 @@
-import Database from "better-sqlite3";
-import { drizzle } from "drizzle-orm/better-sqlite3";
+import { createClient, type Client } from "@libsql/client";
+import { sql } from "drizzle-orm";
+import { drizzle, type LibSQLDatabase } from "drizzle-orm/libsql";
 import fs from "node:fs";
 import path from "node:path";
 import { ROOMS } from "@/lib/data";
 import { roomsTable } from "./schema";
 
-const DB_PATH = path.join(process.cwd(), "data", "hosilgo.db");
+type Db = LibSQLDatabase<{ roomsTable: typeof roomsTable }>;
 
-let sqlite: Database.Database | null = null;
-let db: ReturnType<typeof drizzle> | null = null;
-let initialized = false;
+let client: Client | null = null;
+let db: Db | null = null;
+let ready: Promise<Db | null> | null = null;
 
-function getSqlite() {
-  if (!sqlite) {
-    fs.mkdirSync(path.dirname(DB_PATH), { recursive: true });
-    sqlite = new Database(DB_PATH);
-    sqlite.pragma("journal_mode = WAL");
-  }
-  return sqlite;
+/** Vercel 서버리스는 파일 SQLite 불가 → Turso URL 없으면 시드 데이터 폴백 */
+export function isDatabaseEnabled(): boolean {
+  if (process.env.TURSO_DATABASE_URL) return true;
+  if (process.env.VERCEL === "1") return false;
+  return true;
 }
 
-function initSchema() {
-  if (initialized) return;
-  const client = getSqlite();
-  client.exec(`
+function createDbClient(): Client {
+  const tursoUrl = process.env.TURSO_DATABASE_URL;
+  if (tursoUrl) {
+    return createClient({
+      url: tursoUrl,
+      authToken: process.env.TURSO_AUTH_TOKEN,
+    });
+  }
+
+  const dbPath = path.join(process.cwd(), "data", "hosilgo.db");
+  fs.mkdirSync(path.dirname(dbPath), { recursive: true });
+  return createClient({ url: `file:${dbPath}` });
+}
+
+async function initDb(): Promise<Db | null> {
+  if (!isDatabaseEnabled()) return null;
+
+  client = createDbClient();
+  const database = drizzle(client, { schema: { roomsTable } });
+
+  await database.run(sql`
     CREATE TABLE IF NOT EXISTS rooms (
       id TEXT PRIMARY KEY,
       gosiwon TEXT NOT NULL,
@@ -46,26 +62,11 @@ function initSchema() {
     )
   `);
 
-  const { count } = client
-    .prepare("SELECT COUNT(*) as count FROM rooms")
-    .get() as { count: number };
-
-  if (count === 0) {
-    const insert = client.prepare(`
-      INSERT INTO rooms (
-        id, gosiwon, room_number, district, station, price, deposit, size,
-        window, bathroom, move_in, move_in_label, women_only, foreigner_friendly,
-        no_deposit, image, tags, created_at
-      ) VALUES (
-        @id, @gosiwon, @roomNumber, @district, @station, @price, @deposit, @size,
-        @window, @bathroom, @moveIn, @moveInLabel, @womenOnly, @foreignerFriendly,
-        @noDeposit, @image, @tags, @createdAt
-      )
-    `);
-
+  const existing = await database.select().from(roomsTable).limit(1);
+  if (existing.length === 0) {
     const now = new Date().toISOString();
     for (const room of ROOMS) {
-      insert.run({
+      await database.insert(roomsTable).values({
         id: room.id,
         gosiwon: room.gosiwon,
         roomNumber: room.roomNumber,
@@ -74,13 +75,13 @@ function initSchema() {
         price: room.price,
         deposit: room.deposit,
         size: room.size,
-        window: room.window ? 1 : 0,
+        window: room.window,
         bathroom: room.bathroom,
         moveIn: room.moveIn,
         moveInLabel: room.moveInLabel,
-        womenOnly: room.womenOnly ? 1 : null,
-        foreignerFriendly: room.foreignerFriendly ? 1 : null,
-        noDeposit: room.noDeposit ? 1 : null,
+        womenOnly: room.womenOnly ?? false,
+        foreignerFriendly: room.foreignerFriendly ?? false,
+        noDeposit: room.noDeposit ?? false,
         image: room.image,
         tags: JSON.stringify(room.tags),
         createdAt: now,
@@ -88,17 +89,23 @@ function initSchema() {
     }
   }
 
-  initialized = true;
+  db = database;
+  return database;
 }
 
-export function getDb() {
-  if (!db) {
-    initSchema();
-    db = drizzle(getSqlite(), { schema: { roomsTable } });
+export async function ensureDb(): Promise<Db | null> {
+  if (!isDatabaseEnabled()) return null;
+  if (!ready) {
+    ready = initDb().catch((error) => {
+      ready = null;
+      console.error("[db] init failed", error);
+      throw error;
+    });
   }
-  return db;
+  return ready;
 }
 
-export function getDbPath() {
-  return DB_PATH;
+export function getDbPath(): string {
+  if (process.env.TURSO_DATABASE_URL) return process.env.TURSO_DATABASE_URL;
+  return path.join(process.cwd(), "data", "hosilgo.db");
 }

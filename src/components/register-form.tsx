@@ -38,7 +38,7 @@ function Field({
   );
 }
 
-export function RegisterForm() {
+export function RegisterForm({ dbEnabled = true }: { dbEnabled?: boolean }) {
   const [state, formAction, pending] = useActionState(
     registerRoomAction,
     initialState
@@ -243,9 +243,9 @@ export function RegisterForm() {
 
       <div className="flex flex-col gap-3 border-t border-[#E8E0D4] pt-6 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-xs text-[#5C534C]">
-          등록한 호실은 로컬 SQLite DB(
-          <code className="rounded bg-[#E8E0D4]/60 px-1">data/hosilgo.db</code>
-          )에 저장됩니다.
+          {dbEnabled
+            ? "등록한 호실은 로컬 DB(data/hosilgo.db) 또는 Turso에 저장됩니다."
+            : "현재 환경에서는 등록이 비활성화되어 있습니다."}
         </p>
         <div className="flex gap-3">
           <Link
@@ -259,7 +259,7 @@ export function RegisterForm() {
           </Link>
           <Button
             type="submit"
-            disabled={pending}
+            disabled={pending || !dbEnabled}
             className="rounded-xl bg-[#C45C3E] px-8 hover:bg-[#A84A32] disabled:opacity-60"
           >
             {pending ? "저장 중…" : "호실 등록하기"}
