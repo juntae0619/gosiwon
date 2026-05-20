@@ -3,6 +3,7 @@
 import { useCallback, useState } from "react";
 import { IntroCurtain } from "@/components/intro-curtain";
 import { SiteHeader } from "@/components/site-header";
+import type { SessionUser } from "@/lib/user";
 import { HeroSection } from "@/components/hero-section";
 import { FeaturesSection } from "@/components/features-section";
 import { RoomsSection } from "@/components/rooms-section";
@@ -10,7 +11,15 @@ import { CtaSection } from "@/components/cta-section";
 import { SiteFooter } from "@/components/site-footer";
 import type { Room } from "@/lib/data";
 
-export function HomePage({ rooms }: { rooms: Room[] }) {
+export function HomePage({
+  rooms,
+  user = null,
+  showWelcome = false,
+}: {
+  rooms: Room[];
+  user?: SessionUser | null;
+  showWelcome?: boolean;
+}) {
   const [ready, setReady] = useState(false);
 
   const handleIntroComplete = useCallback(() => {
@@ -21,7 +30,17 @@ export function HomePage({ rooms }: { rooms: Room[] }) {
     <>
       <IntroCurtain onComplete={handleIntroComplete} />
       <div className="min-h-screen bg-[#F7F3ED]">
-        <SiteHeader ready={ready} />
+        <SiteHeader ready={ready} user={user} />
+        {showWelcome && ready && (
+          <div
+            className="mx-auto max-w-6xl px-4 pt-4 md:px-6"
+            role="status"
+          >
+            <p className="rounded-xl border border-[#4A6B5D]/30 bg-[#4A6B5D]/10 px-4 py-3 text-center text-sm text-[#4A6B5D]">
+              회원가입이 완료되었습니다. 환영합니다{user ? `, ${user.name}님` : ""}!
+            </p>
+          </div>
+        )}
         <main>
           <HeroSection ready={ready} rooms={rooms} />
           <FeaturesSection />

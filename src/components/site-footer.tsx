@@ -30,6 +30,16 @@ export function SiteFooter() {
                   추천 호실
                 </HashLink>
               </li>
+              <li>
+                <Link href="/signup" className="hover:text-[#C45C3E]">
+                  회원가입
+                </Link>
+              </li>
+              <li>
+                <Link href="/login" className="hover:text-[#C45C3E]">
+                  로그인
+                </Link>
+              </li>
             </ul>
           </div>
           <div>

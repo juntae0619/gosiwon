@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import { SearchResults } from "@/components/search-results";
-import { SiteHeader } from "@/components/site-header";
+import { SiteHeaderShell } from "@/components/site-header-shell";
 import { SiteFooter } from "@/components/site-footer";
 import { getAllRooms } from "@/lib/rooms-repository";
 
@@ -16,7 +16,7 @@ export default async function SearchPage() {
 
   return (
     <div className="min-h-screen bg-[#F7F3ED]">
-      <SiteHeader ready={true} />
+      <SiteHeaderShell ready={true} />
       <main className="mx-auto max-w-6xl px-4 py-10 md:px-6">
         <Link
           href="/"

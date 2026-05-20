@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Building2, DoorOpen } from "lucide-react";
 import { isDatabaseEnabled } from "@/db";
 import { BusinessRegisterForm } from "@/components/business-register-form";
-import { SiteHeader } from "@/components/site-header";
+import { SiteHeaderShell } from "@/components/site-header-shell";
 import { SiteFooter } from "@/components/site-footer";
 import { getBusinessById } from "@/lib/businesses-repository";
 import { buttonVariants } from "@/components/ui/button";
@@ -32,7 +32,7 @@ export default async function BusinessRegisterPage({ searchParams }: Props) {
 
   return (
     <div className="min-h-screen bg-[#F7F3ED]">
-      <SiteHeader ready={true} />
+      <SiteHeaderShell ready={true} />
       <main className="mx-auto max-w-2xl px-4 py-10 md:px-6">
         <Link
           href="/"

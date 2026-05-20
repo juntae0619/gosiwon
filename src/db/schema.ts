@@ -45,3 +45,16 @@ export const businessesTable = sqliteTable("businesses", {
 });
 
 export type BusinessRow = typeof businessesTable.$inferSelect;
+
+export const usersTable = sqliteTable("users", {
+  id: text("id").primaryKey(),
+  email: text("email").notNull().unique(),
+  passwordHash: text("password_hash").notNull(),
+  name: text("name").notNull(),
+  phone: text("phone"),
+  role: text("role", { enum: ["user", "owner"] }).notNull().default("user"),
+  createdAt: text("created_at").notNull(),
+});
+
+export type UserRow = typeof usersTable.$inferSelect;
+export type NewUserRow = typeof usersTable.$inferInsert;

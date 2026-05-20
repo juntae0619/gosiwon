@@ -1,7 +1,20 @@
 import { HomePage } from "@/components/home-page";
+import { getSession } from "@/lib/auth";
 import { getAllRooms } from "@/lib/rooms-repository";
 
-export default async function Home() {
+type Props = {
+  searchParams: Promise<{ welcome?: string }>;
+};
+
+export default async function Home({ searchParams }: Props) {
   const rooms = await getAllRooms();
-  return <HomePage rooms={rooms} />;
+  const user = await getSession();
+  const { welcome } = await searchParams;
+  return (
+    <HomePage
+      rooms={rooms}
+      user={user}
+      showWelcome={welcome === "1"}
+    />
+  );
 }

@@ -4,11 +4,12 @@ import { drizzle, type LibSQLDatabase } from "drizzle-orm/libsql";
 import fs from "node:fs";
 import path from "node:path";
 import { ROOMS } from "@/lib/data";
-import { businessesTable, roomsTable } from "./schema";
+import { businessesTable, roomsTable, usersTable } from "./schema";
 
 type Db = LibSQLDatabase<{
   roomsTable: typeof roomsTable;
   businessesTable: typeof businessesTable;
+  usersTable: typeof usersTable;
 }>;
 
 let client: Client | null = null;
@@ -41,8 +42,20 @@ async function initDb(): Promise<Db | null> {
 
   client = createDbClient();
   const database = drizzle(client, {
-    schema: { roomsTable, businessesTable },
+    schema: { roomsTable, businessesTable, usersTable },
   });
+
+  await database.run(sql`
+    CREATE TABLE IF NOT EXISTS users (
+      id TEXT PRIMARY KEY,
+      email TEXT NOT NULL UNIQUE,
+      password_hash TEXT NOT NULL,
+      name TEXT NOT NULL,
+      phone TEXT,
+      role TEXT NOT NULL DEFAULT 'user',
+      created_at TEXT NOT NULL
+    )
+  `);
 
   await database.run(sql`
     CREATE TABLE IF NOT EXISTS businesses (

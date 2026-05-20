@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { isDatabaseEnabled } from "@/db";
 import { RegisterForm } from "@/components/register-form";
-import { SiteHeader } from "@/components/site-header";
+import { SiteHeaderShell } from "@/components/site-header-shell";
 import { SiteFooter } from "@/components/site-footer";
 import { getTempRoomById } from "@/lib/temp-rooms";
 import { buttonVariants } from "@/components/ui/button";
@@ -27,7 +27,7 @@ export default async function RegisterPage({ searchParams }: Props) {
 
   return (
     <div className="min-h-screen bg-[#F7F3ED]">
-      <SiteHeader ready={true} />
+      <SiteHeaderShell ready={true} />
       <main className="mx-auto max-w-2xl px-4 py-10 md:px-6">
         <Link
           href="/"

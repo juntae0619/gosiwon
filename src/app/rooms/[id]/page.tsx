@@ -3,7 +3,7 @@ import { RoomImage } from "@/components/room-image";
 import { notFound } from "next/navigation";
 import { Bath, Calendar, DoorOpen, MapPin, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { SiteHeader } from "@/components/site-header";
+import { SiteHeaderShell } from "@/components/site-header-shell";
 import { SiteFooter } from "@/components/site-footer";
 import { formatPrice } from "@/lib/data";
 import { getRoomById } from "@/lib/rooms-repository";
@@ -23,7 +23,7 @@ export default async function RoomDetailPage({ params, searchParams }: Props) {
 
   return (
     <div className="min-h-screen bg-[#F7F3ED]">
-      <SiteHeader ready={true} />
+      <SiteHeaderShell ready={true} />
       <main className="mx-auto max-w-4xl px-4 py-8 md:px-6">
         <Link
           href="/search"

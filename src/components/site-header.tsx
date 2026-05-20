@@ -7,6 +7,8 @@ import { Menu, X } from "lucide-react";
 import { useState } from "react";
 import { buttonVariants } from "@/components/ui/button";
 import { HashLink } from "@/components/hash-link";
+import { LogoutButton } from "@/components/logout-button";
+import type { SessionUser } from "@/lib/user";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
@@ -15,7 +17,13 @@ const NAV_ITEMS = [
   { label: "추천 호실", href: "/#rooms" as const, type: "hash" as const },
 ] as const;
 
-export function SiteHeader({ ready }: { ready: boolean }) {
+export function SiteHeader({
+  ready,
+  user = null,
+}: {
+  ready: boolean;
+  user?: SessionUser | null;
+}) {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -80,11 +88,37 @@ export function SiteHeader({ ready }: { ready: boolean }) {
         </nav>
 
         <motion.div
-          className="flex items-center gap-2"
+          className="flex items-center gap-2 sm:gap-3"
           initial={{ opacity: 0, x: 12 }}
           animate={ready ? { opacity: 1, x: 0 } : {}}
           transition={{ delay: 0.45 }}
         >
+          {user ? (
+            <>
+              <span className="hidden max-w-[120px] truncate text-sm font-medium text-[#1A1614] sm:inline">
+                {user.name}님
+              </span>
+              <LogoutButton className="hidden sm:inline" />
+            </>
+          ) : (
+            <>
+              <Link
+                href="/login"
+                className="hidden text-sm font-medium text-[#5C534C] transition-colors hover:text-[#C45C3E] sm:inline"
+              >
+                로그인
+              </Link>
+              <Link
+                href="/signup"
+                className={cn(
+                  buttonVariants({ size: "default", variant: "outline" }),
+                  "hidden rounded-xl border-[#E8E0D4] bg-[#FFFCF7] px-4 text-[#1A1614] hover:bg-[#F7F3ED] sm:inline-flex"
+                )}
+              >
+                회원가입
+              </Link>
+            </>
+          )}
           <Link
             href="/register"
             className={cn(
@@ -135,7 +169,34 @@ export function SiteHeader({ ready }: { ready: boolean }) {
                 )}
               </li>
             ))}
-            <li className="mt-2 border-t border-[#E8E0D4] pt-2">
+            <li className="mt-2 border-t border-[#E8E0D4] pt-2 space-y-1">
+              {user ? (
+                <>
+                  <p className="px-3 py-2 text-sm font-semibold text-[#1A1614]">
+                    {user.name}님
+                  </p>
+                  <div className="px-3 py-2">
+                    <LogoutButton />
+                  </div>
+                </>
+              ) : (
+                <>
+                  <Link
+                    href="/login"
+                    className="block rounded-lg px-3 py-2.5 text-sm font-medium text-[#5C534C] hover:bg-[#F7F3ED] hover:text-[#C45C3E]"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    로그인
+                  </Link>
+                  <Link
+                    href="/signup"
+                    className="block rounded-lg px-3 py-2.5 text-sm font-medium text-[#5C534C] hover:bg-[#F7F3ED] hover:text-[#C45C3E]"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    회원가입
+                  </Link>
+                </>
+              )}
               <Link
                 href="/register"
                 className={cn(
